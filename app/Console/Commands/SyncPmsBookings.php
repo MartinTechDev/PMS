@@ -24,10 +24,12 @@ class SyncPmsBookings extends Command
 
         ['synced' => $synced, 'failed' => $failed] = $service->sync($lastSyncAt);
 
-        DB::table('pms_sync_states')->updateOrInsert(
-            ['key' => 'last_sync_at'],
-            ['value' => $syncedAt, 'updated_at' => now()],
-        );
+        if ($failed === 0) {
+            DB::table('pms_sync_states')->updateOrInsert(
+                ['key' => 'last_sync_at'],
+                ['value' => $syncedAt, 'updated_at' => now()],
+            );
+        }
 
         $this->info("Sync complete. Synced: {$synced}, Failed: {$failed}");
 

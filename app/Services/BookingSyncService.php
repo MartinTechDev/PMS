@@ -17,6 +17,12 @@ use Throwable;
 
 class BookingSyncService
 {
+    private array $roomCache = [];
+
+    private array $roomTypeCache = [];
+
+    private array $guestCache = [];
+
     public function __construct(
         private readonly PmsClient $client,
         private readonly BookingRepository $bookingRepository,
@@ -36,6 +42,8 @@ class BookingSyncService
 
         $synced = 0;
         $failed = 0;
+        $consecutiveFailures = 0;
+        $maxConsecutiveFailures = 10;
 
         foreach ($ids as $id) {
             try {
@@ -43,12 +51,21 @@ class BookingSyncService
                     $this->syncBooking((int) $id);
                 });
                 $synced++;
+                $consecutiveFailures = 0;
             } catch (Throwable $e) {
                 $failed++;
+                $consecutiveFailures++;
                 Log::channel('pms_errors')->error('Failed to sync booking', [
                     'booking_id' => $id,
                     'error' => $e->getMessage(),
                 ]);
+
+                if ($consecutiveFailures >= $maxConsecutiveFailures) {
+                    Log::channel('pms_errors')->error('Aborting sync: too many consecutive failures', [
+                        'consecutive_failures' => $consecutiveFailures,
+                    ]);
+                    break;
+                }
             }
         }
 
@@ -61,15 +78,24 @@ class BookingSyncService
 
         $guests = [];
         foreach ($bookingData->guest_ids as $guestId) {
-            $guestData = GuestData::from($this->client->getGuest($guestId));
-            $guests[] = $this->guestRepository->upsert($guestData);
+            if (! isset($this->guestCache[$guestId])) {
+                $guestData = GuestData::from($this->client->getGuest($guestId));
+                $this->guestCache[$guestId] = $this->guestRepository->upsert($guestData);
+            }
+            $guests[] = $this->guestCache[$guestId];
         }
 
-        $roomData = RoomData::from($this->client->getRoom($bookingData->room_id));
-        $room = $this->roomRepository->upsert($roomData);
+        if (! isset($this->roomCache[$bookingData->room_id])) {
+            $roomData = RoomData::from($this->client->getRoom($bookingData->room_id));
+            $this->roomCache[$bookingData->room_id] = $this->roomRepository->upsert($roomData);
+        }
+        $room = $this->roomCache[$bookingData->room_id];
 
-        $roomTypeData = RoomTypeData::from($this->client->getRoomType($bookingData->room_type_id));
-        $roomType = $this->roomTypeRepository->upsert($roomTypeData);
+        if (! isset($this->roomTypeCache[$bookingData->room_type_id])) {
+            $roomTypeData = RoomTypeData::from($this->client->getRoomType($bookingData->room_type_id));
+            $this->roomTypeCache[$bookingData->room_type_id] = $this->roomTypeRepository->upsert($roomTypeData);
+        }
+        $roomType = $this->roomTypeCache[$bookingData->room_type_id];
 
         $this->bookingRepository->upsert($bookingData, $room, $roomType, $guests);
     }

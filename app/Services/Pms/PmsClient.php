@@ -6,9 +6,19 @@ use Illuminate\Support\Facades\Http;
 
 class PmsClient
 {
+    private float $lastRequestAt = 0;
+
     private function throttle(): void
     {
-        usleep((int) (1_000_000 / config('pms.rate_limit_per_second')));
+        $interval = 1_000_000 / config('pms.rate_limit_per_second');
+        $elapsed = (microtime(true) - $this->lastRequestAt) * 1_000_000;
+        $remaining = $interval - $elapsed;
+
+        if ($remaining > 0) {
+            usleep((int) $remaining);
+        }
+
+        $this->lastRequestAt = microtime(true);
     }
 
     public function getUpdatedBookingIds(?string $updatedAfter): array
