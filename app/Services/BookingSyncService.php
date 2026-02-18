@@ -36,7 +36,7 @@ class BookingSyncService
      *
      * @return array{synced: int, failed: int}
      */
-    public function sync(?string $updatedAfter): array
+    public function sync(?string $updatedAfter, ?callable $onProgress = null): array
     {
         $ids = $this->client->getUpdatedBookingIds($updatedAfter);
 
@@ -46,6 +46,8 @@ class BookingSyncService
         $maxConsecutiveFailures = 10;
 
         foreach ($ids as $id) {
+            $abort = false;
+
             try {
                 DB::transaction(function () use ($id) {
                     $this->syncBooking((int) $id);
@@ -64,8 +66,16 @@ class BookingSyncService
                     Log::channel('pms_errors')->error('Aborting sync: too many consecutive failures', [
                         'consecutive_failures' => $consecutiveFailures,
                     ]);
-                    break;
+                    $abort = true;
                 }
+            }
+
+            if ($onProgress) {
+                ($onProgress)();
+            }
+
+            if ($abort) {
+                break;
             }
         }
 

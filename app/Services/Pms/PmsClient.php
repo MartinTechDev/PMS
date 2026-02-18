@@ -21,6 +21,9 @@ class PmsClient
         $this->lastRequestAt = microtime(true);
     }
 
+    /**
+     * @return list<int>
+     */
     public function getUpdatedBookingIds(?string $updatedAfter): array
     {
         $this->throttle();
@@ -31,6 +34,9 @@ class PmsClient
             ->json('data');
     }
 
+    /**
+     * @return array{id: int, room_id: int, room_type_id: int, guest_ids: list<int>, arrival_date: string, departure_date: string, status: string, notes: ?string}
+     */
     public function getBooking(int $id): array
     {
         $this->throttle();
@@ -41,6 +47,9 @@ class PmsClient
             ->json();
     }
 
+    /**
+     * @return array{id: int, first_name: string, last_name: string, email: ?string}
+     */
     public function getGuest(int $id): array
     {
         $this->throttle();
@@ -51,6 +60,9 @@ class PmsClient
             ->json();
     }
 
+    /**
+     * @return array{id: int, number: string, floor: int}
+     */
     public function getRoom(int $id): array
     {
         $this->throttle();
@@ -61,6 +73,9 @@ class PmsClient
             ->json();
     }
 
+    /**
+     * @return array{id: int, name: string, description: ?string}
+     */
     public function getRoomType(int $id): array
     {
         $this->throttle();

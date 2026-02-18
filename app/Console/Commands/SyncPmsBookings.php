@@ -5,24 +5,40 @@ namespace App\Console\Commands;
 use App\Services\BookingSyncService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SyncPmsBookings extends Command
 {
-    protected $signature = 'pms:sync-bookings';
+    protected $signature = 'pms:sync-bookings {--fresh : Ignore last sync timestamp and perform a full sync}';
 
     protected $description = 'Synchronize bookings from the PMS API';
 
     public function handle(BookingSyncService $service): int
     {
-        $lastSyncAt = DB::table('pms_sync_states')
-            ->where('key', 'last_sync_at')
-            ->value('value');
+        $lastSyncAt = $this->option('fresh')
+            ? null
+            : DB::table('pms_sync_states')->where('key', 'last_sync_at')->value('value');
 
-        $this->info('Starting PMS booking sync'.($lastSyncAt ? " (since {$lastSyncAt})" : ' (full sync)'));
+        $label = match (true) {
+            $this->option('fresh') => 'full sync (forced)',
+            $lastSyncAt !== null => "since {$lastSyncAt}",
+            default => 'full sync',
+        };
+
+        $this->info("Starting PMS booking sync ({$label})");
 
         $syncedAt = now()->toIso8601String();
 
-        ['synced' => $synced, 'failed' => $failed] = $service->sync($lastSyncAt);
+        $bar = $this->output->createProgressBar();
+        $bar->start();
+
+        ['synced' => $synced, 'failed' => $failed] = $service->sync(
+            $lastSyncAt,
+            fn () => $bar->advance(),
+        );
+
+        $bar->finish();
+        $this->newLine();
 
         if ($failed === 0) {
             DB::table('pms_sync_states')->updateOrInsert(
@@ -30,6 +46,12 @@ class SyncPmsBookings extends Command
                 ['value' => $syncedAt, 'updated_at' => now()],
             );
         }
+
+        Log::channel('pms_errors')->info('Sync completed', [
+            'synced' => $synced,
+            'failed' => $failed,
+            'since' => $lastSyncAt,
+        ]);
 
         $this->info("Sync complete. Synced: {$synced}, Failed: {$failed}");
 
