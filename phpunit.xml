@@ -32,5 +32,6 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="PMS_BASE_URL" value="https://api.pms.donatix.info"/>
+        <env name="APP_KEY" value="base64:eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHg="/>
     </php>
 </phpunit>

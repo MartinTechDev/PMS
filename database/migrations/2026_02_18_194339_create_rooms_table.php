@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('external_id')->unique();
-            $table->foreignId('room_type_id')->constrained()->nullOnDelete();
             $table->string('name');
+            $table->integer('floor')->default(0);
             $table->timestamps();
         });
     }

@@ -13,6 +13,5 @@ class GuestData extends Data
         public readonly string $first_name,
         public readonly string $last_name,
         public readonly ?string $email,
-        public readonly ?string $phone,
     ) {}
 }

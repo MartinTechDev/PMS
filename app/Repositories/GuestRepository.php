@@ -15,7 +15,6 @@ class GuestRepository
                 'first_name' => $data->first_name,
                 'last_name' => $data->last_name,
                 'email' => $data->email,
-                'phone' => $data->phone,
             ],
         );
     }

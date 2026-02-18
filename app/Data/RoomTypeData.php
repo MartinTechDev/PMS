@@ -11,5 +11,6 @@ class RoomTypeData extends Data
         #[MapInputName('id')]
         public readonly int $external_id,
         public readonly string $name,
+        public readonly ?string $description,
     ) {}
 }

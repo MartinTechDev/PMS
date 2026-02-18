@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('external_id')->unique();
             $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

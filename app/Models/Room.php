@@ -2,21 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['external_id', 'room_type_id', 'name'];
-
-    public function roomType(): BelongsTo
-    {
-        return $this->belongsTo(RoomType::class);
-    }
+    protected $fillable = ['external_id', 'name', 'floor'];
 
     public function bookings(): HasMany
     {

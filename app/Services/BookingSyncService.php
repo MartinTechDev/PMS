@@ -59,14 +59,18 @@ class BookingSyncService
     {
         $bookingData = BookingData::from($this->client->getBooking($id));
 
-        $guestData = GuestData::from($this->client->getGuest($bookingData->guest_id));
-        $guest = $this->guestRepository->upsert($guestData);
+        $guests = [];
+        foreach ($bookingData->guest_ids as $guestId) {
+            $guestData = GuestData::from($this->client->getGuest($guestId));
+            $guests[] = $this->guestRepository->upsert($guestData);
+        }
 
         $roomData = RoomData::from($this->client->getRoom($bookingData->room_id));
-        $roomTypeData = RoomTypeData::from($this->client->getRoomType($roomData->room_type_id));
-        $roomType = $this->roomTypeRepository->upsert($roomTypeData);
-        $room = $this->roomRepository->upsert($roomData, $roomType);
+        $room = $this->roomRepository->upsert($roomData);
 
-        $this->bookingRepository->upsert($bookingData, $room, $guest);
+        $roomTypeData = RoomTypeData::from($this->client->getRoomType($bookingData->room_type_id));
+        $roomType = $this->roomTypeRepository->upsert($roomTypeData);
+
+        $this->bookingRepository->upsert($bookingData, $room, $roomType, $guests);
     }
 }

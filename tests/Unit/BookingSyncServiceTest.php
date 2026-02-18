@@ -16,27 +16,28 @@ it('returns synced and failed counts', function () {
     $client->shouldReceive('getBooking')->with(42)->once()->andReturn([
         'id' => 42,
         'room_id' => 1,
-        'guest_id' => 1,
-        'check_in' => '2026-03-01',
-        'check_out' => '2026-03-05',
+        'room_type_id' => 1,
+        'guest_ids' => [1],
+        'arrival_date' => '2026-03-01',
+        'departure_date' => '2026-03-05',
         'status' => 'confirmed',
-        'total_price' => 300.00,
+        'notes' => null,
     ]);
     $client->shouldReceive('getGuest')->with(1)->once()->andReturn([
         'id' => 1,
         'first_name' => 'Test',
         'last_name' => 'User',
         'email' => null,
-        'phone' => null,
     ]);
     $client->shouldReceive('getRoom')->with(1)->once()->andReturn([
         'id' => 1,
-        'room_type_id' => 1,
-        'name' => 'Room 1',
+        'number' => '101',
+        'floor' => 1,
     ]);
     $client->shouldReceive('getRoomType')->with(1)->once()->andReturn([
         'id' => 1,
         'name' => 'Standard',
+        'description' => null,
     ]);
 
     $service = new BookingSyncService(

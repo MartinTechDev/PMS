@@ -16,9 +16,9 @@ class PmsClient
         $this->throttle();
 
         return Http::pms()
-            ->get('/api/bookings', array_filter(['updated_at.gt' => $updatedAfter]))
+            ->get('/api/bookings', array_filter(['updated_at.gt' => $updatedAfter], fn ($v) => $v !== null))
             ->throw()
-            ->json();
+            ->json('data');
     }
 
     public function getBooking(int $id): array

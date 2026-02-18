@@ -14,29 +14,30 @@ it('syncs bookings from the PMS API', function () {
         '*/api/bookings/1' => Http::response([
             'id' => 1,
             'room_id' => 10,
-            'guest_id' => 20,
-            'check_in' => '2026-03-01',
-            'check_out' => '2026-03-05',
+            'room_type_id' => 5,
+            'guest_ids' => [20],
+            'arrival_date' => '2026-03-01',
+            'departure_date' => '2026-03-05',
             'status' => 'confirmed',
-            'total_price' => 500.00,
+            'notes' => 'VIP guest',
         ]),
         '*/api/guests/20' => Http::response([
             'id' => 20,
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john@example.com',
-            'phone' => '+1234567890',
         ]),
         '*/api/rooms/10' => Http::response([
             'id' => 10,
-            'room_type_id' => 5,
-            'name' => 'Room 101',
+            'number' => '101',
+            'floor' => 1,
         ]),
         '*/api/room-types/5' => Http::response([
             'id' => 5,
             'name' => 'Deluxe',
+            'description' => 'Spacious deluxe room',
         ]),
-        '*/api/bookings*' => Http::response([1]),
+        '*/api/bookings*' => Http::response(['data' => [1]]),
     ]);
 
     $this->artisan('pms:sync-bookings')->assertSuccessful();
@@ -44,7 +45,10 @@ it('syncs bookings from the PMS API', function () {
     expect(RoomType::where('external_id', 5)->exists())->toBeTrue();
     expect(Room::where('external_id', 10)->exists())->toBeTrue();
     expect(Guest::where('external_id', 20)->exists())->toBeTrue();
-    expect(Booking::where('external_id', 1)->exists())->toBeTrue();
+
+    $booking = Booking::where('external_id', 1)->first();
+    expect($booking)->not->toBeNull();
+    expect($booking->guests()->where('external_id', 20)->exists())->toBeTrue();
 });
 
 it('is idempotent when run twice', function () {
@@ -52,29 +56,30 @@ it('is idempotent when run twice', function () {
         '*/api/bookings/1' => Http::response([
             'id' => 1,
             'room_id' => 10,
-            'guest_id' => 20,
-            'check_in' => '2026-03-01',
-            'check_out' => '2026-03-05',
+            'room_type_id' => 5,
+            'guest_ids' => [20],
+            'arrival_date' => '2026-03-01',
+            'departure_date' => '2026-03-05',
             'status' => 'confirmed',
-            'total_price' => 500.00,
+            'notes' => null,
         ]),
         '*/api/guests/20' => Http::response([
             'id' => 20,
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john@example.com',
-            'phone' => null,
         ]),
         '*/api/rooms/10' => Http::response([
             'id' => 10,
-            'room_type_id' => 5,
-            'name' => 'Room 101',
+            'number' => '101',
+            'floor' => 1,
         ]),
         '*/api/room-types/5' => Http::response([
             'id' => 5,
             'name' => 'Deluxe',
+            'description' => null,
         ]),
-        '*/api/bookings*' => Http::response([1]),
+        '*/api/bookings*' => Http::response(['data' => [1]]),
     ]);
 
     $this->artisan('pms:sync-bookings')->assertSuccessful();
@@ -92,29 +97,30 @@ it('continues syncing other bookings when one fails', function () {
         '*/api/bookings/2' => Http::response([
             'id' => 2,
             'room_id' => 11,
-            'guest_id' => 21,
-            'check_in' => '2026-04-01',
-            'check_out' => '2026-04-03',
+            'room_type_id' => 5,
+            'guest_ids' => [21],
+            'arrival_date' => '2026-04-01',
+            'departure_date' => '2026-04-03',
             'status' => 'pending',
-            'total_price' => 200.00,
+            'notes' => null,
         ]),
         '*/api/guests/21' => Http::response([
             'id' => 21,
             'first_name' => 'Jane',
             'last_name' => 'Smith',
             'email' => null,
-            'phone' => null,
         ]),
         '*/api/rooms/11' => Http::response([
             'id' => 11,
-            'room_type_id' => 5,
-            'name' => 'Room 102',
+            'number' => '102',
+            'floor' => 1,
         ]),
         '*/api/room-types/5' => Http::response([
             'id' => 5,
             'name' => 'Deluxe',
+            'description' => null,
         ]),
-        '*/api/bookings*' => Http::response([1, 2]),
+        '*/api/bookings*' => Http::response(['data' => [1, 2]]),
     ]);
 
     $this->artisan('pms:sync-bookings')->assertFailed();

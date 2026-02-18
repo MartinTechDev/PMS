@@ -2,18 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Guest extends Model
 {
-    use HasFactory;
+    protected $fillable = ['external_id', 'first_name', 'last_name', 'email'];
 
-    protected $fillable = ['external_id', 'first_name', 'last_name', 'email', 'phone'];
-
-    public function bookings(): HasMany
+    public function bookings(): BelongsToMany
     {
-        return $this->hasMany(Booking::class);
+        return $this->belongsToMany(Booking::class);
     }
 }

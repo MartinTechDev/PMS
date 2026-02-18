@@ -11,10 +11,14 @@ class BookingData extends Data
         #[MapInputName('id')]
         public readonly int $external_id,
         public readonly int $room_id,
-        public readonly int $guest_id,
+        public readonly int $room_type_id,
+        #[MapInputName('guest_ids')]
+        public readonly array $guest_ids,
+        #[MapInputName('arrival_date')]
         public readonly string $check_in,
+        #[MapInputName('departure_date')]
         public readonly string $check_out,
         public readonly string $status,
-        public readonly ?float $total_price,
+        public readonly ?string $notes,
     ) {}
 }

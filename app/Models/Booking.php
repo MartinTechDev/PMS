@@ -2,22 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Booking extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'external_id',
-        'room_id',
-        'guest_id',
-        'check_in',
-        'check_out',
-        'status',
-        'total_price',
+        'external_id', 'room_id', 'room_type_id',
+        'check_in', 'check_out', 'status', 'notes',
     ];
 
     protected function casts(): array
@@ -25,7 +18,6 @@ class Booking extends Model
         return [
             'check_in' => 'date',
             'check_out' => 'date',
-            'total_price' => 'decimal:2',
         ];
     }
 
@@ -34,8 +26,13 @@ class Booking extends Model
         return $this->belongsTo(Room::class);
     }
 
-    public function guest(): BelongsTo
+    public function roomType(): BelongsTo
     {
-        return $this->belongsTo(Guest::class);
+        return $this->belongsTo(RoomType::class);
+    }
+
+    public function guests(): BelongsToMany
+    {
+        return $this->belongsToMany(Guest::class);
     }
 }

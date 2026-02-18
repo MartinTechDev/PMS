@@ -11,7 +11,7 @@ class RoomTypeRepository
     {
         return RoomType::updateOrCreate(
             ['external_id' => $data->external_id],
-            ['name' => $data->name],
+            ['name' => $data->name, 'description' => $data->description],
         );
     }
 }
