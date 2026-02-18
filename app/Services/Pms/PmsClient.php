@@ -4,7 +4,7 @@ namespace App\Services\Pms;
 
 use Illuminate\Support\Facades\Http;
 
-class PmsClient
+class PmsClient implements PmsClientInterface
 {
     private float $lastRequestAt = 0;
 

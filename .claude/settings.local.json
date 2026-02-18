@@ -7,7 +7,8 @@
       "Bash(composer run test:*)",
       "Bash(php -r:*)",
       "Bash(php artisan test:*)",
-      "Bash(vendor/bin/pint:*)"
+      "Bash(vendor/bin/pint:*)",
+      "Bash(composer require:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

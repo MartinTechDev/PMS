@@ -2,6 +2,7 @@
 
 namespace App\Data;
 
+use App\Enums\BookingStatus;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 
@@ -18,7 +19,7 @@ class BookingData extends Data
         public readonly string $check_in,
         #[MapInputName('departure_date')]
         public readonly string $check_out,
-        public readonly string $status,
+        public readonly BookingStatus $status,
         public readonly ?string $notes,
     ) {}
 }

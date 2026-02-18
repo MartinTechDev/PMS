@@ -5,13 +5,13 @@ use App\Repositories\GuestRepository;
 use App\Repositories\RoomRepository;
 use App\Repositories\RoomTypeRepository;
 use App\Services\BookingSyncService;
-use App\Services\Pms\PmsClient;
+use App\Services\Pms\PmsClientInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 it('returns synced and failed counts', function () {
-    $client = Mockery::mock(PmsClient::class);
+    $client = Mockery::mock(PmsClientInterface::class);
     $client->shouldReceive('getUpdatedBookingIds')->once()->andReturn([42]);
     $client->shouldReceive('getBooking')->with(42)->once()->andReturn([
         'id' => 42,
@@ -55,7 +55,7 @@ it('returns synced and failed counts', function () {
 });
 
 it('counts failures when client throws', function () {
-    $client = Mockery::mock(PmsClient::class);
+    $client = Mockery::mock(PmsClientInterface::class);
     $client->shouldReceive('getUpdatedBookingIds')->once()->andReturn([99]);
     $client->shouldReceive('getBooking')->with(99)->once()->andThrow(new RuntimeException('API error'));
 

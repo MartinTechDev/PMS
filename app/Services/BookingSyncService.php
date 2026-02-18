@@ -10,7 +10,7 @@ use App\Repositories\BookingRepository;
 use App\Repositories\GuestRepository;
 use App\Repositories\RoomRepository;
 use App\Repositories\RoomTypeRepository;
-use App\Services\Pms\PmsClient;
+use App\Services\Pms\PmsClientInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -24,7 +24,7 @@ class BookingSyncService
     private array $guestCache = [];
 
     public function __construct(
-        private readonly PmsClient $client,
+        private readonly PmsClientInterface $client,
         private readonly BookingRepository $bookingRepository,
         private readonly GuestRepository $guestRepository,
         private readonly RoomRepository $roomRepository,
