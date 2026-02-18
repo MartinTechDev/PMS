@@ -127,6 +127,12 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'pms_errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/pms/errors.log'),
+            'level' => 'error',
+        ],
+
     ],
 
 ];
