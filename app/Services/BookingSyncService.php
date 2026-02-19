@@ -40,6 +40,17 @@ class BookingSyncService
     {
         $ids = $this->client->getUpdatedBookingIds($updatedAfter);
 
+        return $this->syncIds($ids, $onProgress);
+    }
+
+    /**
+     * Sync a specific set of booking IDs.
+     *
+     * @param  array<int|string>  $ids
+     * @return array{synced: int, failed: int}
+     */
+    public function syncIds(array $ids, ?callable $onProgress = null): array
+    {
         $synced = 0;
         $failed = 0;
         $consecutiveFailures = 0;
