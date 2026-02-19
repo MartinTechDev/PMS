@@ -10,7 +10,8 @@
       "Bash(vendor/bin/pint:*)",
       "Bash(composer require:*)",
       "mcp__laravel-boost__list-artisan-commands",
-      "Bash(php artisan make:job:*)"
+      "Bash(php artisan make:job:*)",
+      "Bash(php artisan:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
