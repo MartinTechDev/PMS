@@ -14,7 +14,7 @@ class SyncPmsBookings extends Command
     protected $signature = 'pms:sync-bookings
         {--fresh : Ignore last sync timestamp and perform a full sync}
         {--sync : Run synchronously instead of dispatching queued jobs}
-        {--chunk-size=50 : Number of booking IDs per queued job}';
+        {--chunk-size=10 : Number of booking IDs per queued job}';
 
     protected $description = 'Synchronize bookings from the PMS API';
 
