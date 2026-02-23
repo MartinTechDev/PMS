@@ -107,14 +107,22 @@ class BookingSyncService
         }
 
         if (! isset($this->roomCache[$bookingData->room_id])) {
-            $roomData = RoomData::from($this->client->getRoom($bookingData->room_id));
-            $this->roomCache[$bookingData->room_id] = $this->roomRepository->upsert($roomData);
+            $room = $this->roomRepository->findByExternalId($bookingData->room_id);
+            if ($room === null) {
+                $roomData = RoomData::from($this->client->getRoom($bookingData->room_id));
+                $room = $this->roomRepository->upsert($roomData);
+            }
+            $this->roomCache[$bookingData->room_id] = $room;
         }
         $room = $this->roomCache[$bookingData->room_id];
 
         if (! isset($this->roomTypeCache[$bookingData->room_type_id])) {
-            $roomTypeData = RoomTypeData::from($this->client->getRoomType($bookingData->room_type_id));
-            $this->roomTypeCache[$bookingData->room_type_id] = $this->roomTypeRepository->upsert($roomTypeData);
+            $roomType = $this->roomTypeRepository->findByExternalId($bookingData->room_type_id);
+            if ($roomType === null) {
+                $roomTypeData = RoomTypeData::from($this->client->getRoomType($bookingData->room_type_id));
+                $roomType = $this->roomTypeRepository->upsert($roomTypeData);
+            }
+            $this->roomTypeCache[$bookingData->room_type_id] = $roomType;
         }
         $roomType = $this->roomTypeCache[$bookingData->room_type_id];
 

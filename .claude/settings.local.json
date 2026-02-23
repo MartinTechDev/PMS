@@ -11,7 +11,8 @@
       "Bash(composer require:*)",
       "mcp__laravel-boost__list-artisan-commands",
       "Bash(php artisan make:job:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "mcp__laravel-boost__list-available-env-vars"
     ]
   },
   "enableAllProjectMcpServers": true,

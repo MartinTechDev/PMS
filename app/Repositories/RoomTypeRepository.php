@@ -7,6 +7,11 @@ use App\Models\RoomType;
 
 class RoomTypeRepository
 {
+    public function findByExternalId(int $externalId): ?RoomType
+    {
+        return RoomType::query()->where('external_id', $externalId)->first();
+    }
+
     public function upsert(RoomTypeData $data): RoomType
     {
         return RoomType::updateOrCreate(
